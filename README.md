@@ -47,7 +47,7 @@ Every push to the **main** branch triggers:
 1. Docker image build
 2. Pipeline execution
 3. Artifact generation (CSV + plot)
-4. 
+
 ## License
 MIT License
 
