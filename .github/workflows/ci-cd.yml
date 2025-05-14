@@ -1,0 +1,22 @@
+name: Data Pipeline CI/CD  
+
+on:  
+  push:  
+    branches:  
+      - main  
+
+jobs:  
+  build:  
+    runs-on: windows-latest
+    steps:  
+      - name: Checkout code  
+        uses: actions/checkout@v2  
+
+      - name: Set up Docker  
+        uses: docker/setup-buildx-action@v1  
+
+      - name: Build Docker image  
+        run: docker build -t data-pipeline .  
+
+      - name: Run pipeline  
+        run: docker-compose run pipeline  

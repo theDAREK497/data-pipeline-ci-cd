@@ -1,0 +1,8 @@
+version: '3'  
+services:  
+  pipeline:  
+    build: .  
+    volumes:  
+      - ./data:/app/data  
+      - ./docs:/app/docs  
+    command: python src/data_collector.py && python src/data_processor.py && python src/visualizer.py  
