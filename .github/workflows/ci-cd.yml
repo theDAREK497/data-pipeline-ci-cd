@@ -14,7 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Docker Compose
+      - name: Install dependencies (curl, ca-certificates)
+        run: |
+          apk add --update curl ca-certificates
+
+      - name: Install Docker Compose Plugin
         run: |
           # Установка Docker Compose Plugin
           DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
