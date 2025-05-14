@@ -2,7 +2,6 @@ import pandas as pd
 import os  
 
 def collect_data():  
-    # Пример: загрузка данных из CSV (замените на реальные данные)  
     data = pd.read_csv("data/sales_data.csv")  
     return data  
 
