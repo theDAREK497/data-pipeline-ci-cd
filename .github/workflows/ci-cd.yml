@@ -8,22 +8,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: docker:24.0
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Update system packages
+      - name: Install Docker Compose
         run: |
-          sudo apt-get update
-          sudo apt-get upgrade -y
-
-      - name: Install Docker Compose via apt
-        run: |
-          sudo apt-get install -y docker-compose
+          # Установка Docker Compose Plugin
+          DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+          mkdir -p $DOCKER_CONFIG/cli-plugins
+          curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64  -o $DOCKER_CONFIG/cli-plugins/docker-compose
+          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
           docker-compose --version
 
-      - name: Build Docker image
-        run: docker build -t data-pipeline .
-
       - name: Run pipeline
-        run: docker-compose run pipeline
+        run: |
+          docker-compose up
