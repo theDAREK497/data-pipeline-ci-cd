@@ -15,12 +15,9 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
-      - name: Install Docker Compose Plugin
+      - name: Install Docker Compose via pip
         run: |
-          DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-          mkdir -p $DOCKER_CONFIG/cli-plugins
-          curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64  -o $DOCKER_CONFIG/cli-plugins/docker-compose
-          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+          pip install docker-compose
           docker-compose --version
 
       - name: Build Docker image
