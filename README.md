@@ -28,7 +28,7 @@ A simple automated data pipeline that collects, processes, and visualizes data u
    ```
 2. **Prepare input data**:
    Place a CSV file named sales_data.csv in the data/ folder with columns:
-   ```bash 
+   ```csv 
    category,sales  
    electronics,1000  
    clothing,800  
