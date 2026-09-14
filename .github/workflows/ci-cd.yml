@@ -1,32 +1,61 @@
-name: Data Pipeline CI/CD
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+  validate:
+    name: Quality, tests, security & Docker
     runs-on: ubuntu-latest
-    container:
-      image: docker:24.0
+    timeout-minutes: 15
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: Install dependencies (curl, ca-certificates)
-        run: |
-          apk add --update curl ca-certificates
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
-      - name: Install Docker Compose Plugin
-        run: |
-          # Установка Docker Compose Plugin
-          DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-          mkdir -p $DOCKER_CONFIG/cli-plugins
-          curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64  -o $DOCKER_CONFIG/cli-plugins/docker-compose
-          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-          docker-compose --version
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
 
-      - name: Run pipeline
+      - name: Ruff
+        run: ruff check .
+
+      - name: Tests
+        run: python -m pytest
+
+      - name: Bandit
+        run: bandit -q -r src
+
+      - name: Audit runtime dependencies
+        run: pip-audit -r requirements.txt
+
+      - name: Pipeline smoke test
         run: |
-          docker-compose up
+          python -m src.pipeline --output-dir artifacts
+          test -s artifacts/raw_data.csv
+          test -s artifacts/processed_data.csv
+          test -s artifacts/sales_plot.png
+
+      - name: Build Docker image
+        run: docker build -t data-pipeline-ci-cd .
+
+      - name: Run Docker image
+        run: docker run --rm data-pipeline-ci-cd

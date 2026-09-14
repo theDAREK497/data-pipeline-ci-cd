@@ -1,3 +1,7 @@
-__pycache__
-*.pyc
+__pycache__/
+*.py[cod]
 *.env
+.venv/
+.pytest_cache/
+.ruff_cache/
+artifacts/
